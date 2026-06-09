@@ -1,0 +1,5 @@
+export const dynamic = 'force-static';
+
+export async function GET() {
+  return Response.json({ code: "204", message: "weather disabled in static export" });
+}
