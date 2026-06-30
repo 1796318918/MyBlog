@@ -1,3 +1,4 @@
+@import url("https://fontsapi.zeoseven.com/292/main/result.css");
 @import "tailwindcss";
 
 /* 1. 声明暗黑模式变体 */
@@ -8,11 +9,13 @@
   :root {
     --font-geist-sans: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
     --font-geist-mono: "JetBrains Mono", "Cascadia Code", Consolas, monospace;
-    --font-serif: "Source Han Serif SC", "Noto Serif SC", "Songti SC", "SimSun", serif;
+    /* Chr (2026年06月30日): 全站主字体切换为 LXGW WenKai，并保留中文字体兜底。 */
+    --font-serif: "LXGW WenKai", "Source Han Serif SC", "Noto Serif SC", "Songti SC", "SimSun", serif;
   }
 
   body {
     font-family: var(--font-serif);
+    font-weight: normal;
     @apply transition-colors duration-1000 text-slate-900 bg-slate-50;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;

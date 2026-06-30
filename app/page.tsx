@@ -104,15 +104,12 @@ export default function Home() {
               {/* 第二行：文章轮播 + 杂谈轮播 */}
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 w-full">
 
+                
                 {/* 左侧：文章轮播 (电脑端占4列，手机端排最上面) */}
-                <div className="col-span-1 lg:col-span-4 flex flex-col min-h-[300px]">
+                <div className="col-span-1 lg:col-span-12 flex flex-col min-h-[300px]">
                   <LatestPostsCarousel posts={top5Posts} />
                 </div>
-
-                {/* 右侧：杂谈轮播 */}
-                <div className="col-span-1 lg:col-span-8 flex flex-col min-h-[300px]">
-                  <LatestChatterCarousel chatters={top5Chatters} />
-                </div>
+                
               </div>
             </main>
           </div>
