@@ -5,12 +5,14 @@ import { useState, useEffect, useRef } from 'react';
 import { usePathname } from 'next/navigation';
 import { motion, AnimatePresence, useMotionValue, useSpring, useTransform, PanInfo } from 'framer-motion';
 import { siteConfig } from '../siteConfig';
+import { useTheme } from './ThemeProvider';
 
 export default function Navbar() {
   const [showNav, setShowNav] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const pathname = usePathname();
+  const { isDark, toggleTheme } = useTheme();
 
   // --- 🌟 物理引擎：菜单转动逻辑 ---
   const wheelRef = useRef<HTMLDivElement>(null);
@@ -71,11 +73,8 @@ export default function Navbar() {
   const navLinks = [
     { name: '首页', href: '/' },
     { name: '项目', href: '/projects' },
-    { name: '归档', href: '/timeline' },
-    { name: '照片墙', href: '/photowall' },
-    { name: '音乐', href: '/music' },
-    { name: '说说', href: '/moments' },
-    { name: '杂谈', href: '/chatter' },
+    // Chr (2026年06月29日): 精简导航入口，归档页作为博客入口。
+    { name: '博客', href: '/timeline' },
     { name: '关于', href: '/about' },
   ];
 
@@ -91,18 +90,50 @@ export default function Navbar() {
             <span className="text-indigo-500 mx-1">{siteConfig.navSuffix || 'の'}</span>
             {siteConfig.navAfter || 'Blog'}
           </Link>
-          <nav className="flex gap-8 text-sm font-bold">
-            {/* PC端依然使用全量的 navLinks */}
-            {navLinks.map((link) => {
-              const isActive = pathname === link.href || pathname === `${link.href}/`;
-              return (
-                <Link key={link.href} href={link.href} className={`relative py-1 transition-colors ${isActive ? 'text-indigo-600 dark:text-indigo-400' : 'text-slate-700 dark:text-slate-200 hover:text-indigo-600'}`}>
-                  {link.name}
-                  {isActive && <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 bg-indigo-500 rounded-full animate-pulse"></span>}
-                </Link>
-              );
-            })}
-          </nav>
+          <div className="flex items-center gap-8">
+            <nav className="flex gap-8 text-sm font-bold">
+              {/* PC端依然使用全量的 navLinks */}
+              {navLinks.map((link) => {
+                const isActive = pathname === link.href || pathname === `${link.href}/`;
+                return (
+                  <Link key={link.href} href={link.href} className={`relative py-1 transition-colors ${isActive ? 'text-indigo-600 dark:text-indigo-400' : 'text-slate-700 dark:text-slate-200 hover:text-indigo-600'}`}>
+                    {link.name}
+                    {isActive && <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 bg-indigo-500 rounded-full animate-pulse"></span>}
+                  </Link>
+                );
+              })}
+            </nav>
+            {/* Chr (2026年06月29日): 顶部导航接入拟物开关，保留原组件比例后整体缩放。 */}
+            <label
+              htmlFor="nav-theme-switch"
+              className="relative block h-[54px] w-24 cursor-pointer transition-transform duration-300 hover:scale-105 active:scale-95"
+              title={isDark ? '切换到日间模式' : '切换到夜间模式'}
+            >
+              <span className="absolute left-0 top-0 block w-48 aspect-video origin-top-left scale-50 rounded-xl has-[:checked]:bg-[#3a3347] bg-[#ebe6ef] border-4 border-[#121331]">
+                <span className="flex h-full w-full px-2 items-center gap-x-2">
+                  <span className="w-6 h-6 flex-shrink-0 rounded-full border-4 border-[#121331]" />
+                  <span className="has-[:checked]:scale-x-[-1] w-full h-10 border-4 border-[#121331] rounded">
+                    <input
+                      type="checkbox"
+                      id="nav-theme-switch"
+                      className="sr-only"
+                      checked={isDark}
+                      onChange={toggleTheme}
+                      aria-label={isDark ? '切换到日间模式' : '切换到夜间模式'}
+                    />
+                    <span className="w-full h-full bg-[#f24c00] relative block">
+                      <span className="block w-0 h-0 z-20 border-l-[24px] border-l-transparent border-r-[24px] border-r-transparent border-t-[20px] border-t-[#121331] relative">
+                        <span className="block w-0 h-0 absolute border-l-[18px] border-l-transparent border-r-[18px] border-r-transparent border-t-[15px] border-t-[#e44901] -top-5 -left-[18px]" />
+                      </span>
+                      <span className="block w-[24px] h-9 z-10 absolute top-[9px] left-0 bg-[#f24c00] border-r-2 border-b-4 border-[#121331] transform skew-y-[39deg]" />
+                      <span className="block w-[25px] h-9 z-10 absolute top-[9px] left-[24px] bg-[#c44002] border-r-4 border-l-2 border-b-4 border-[#121331] transform skew-y-[-39deg]" />
+                    </span>
+                  </span>
+                  <span className="w-6 h-1 flex-shrink-0 bg-[#121331] rounded-full" />
+                </span>
+              </span>
+            </label>
+          </div>
         </div>
       </header>
 

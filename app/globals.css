@@ -33,10 +33,7 @@
     --tw-prose-links: var(--color-indigo-400);
   }
 
-  [class*="backdrop-blur-"] {
-    will-change: backdrop-filter;
-    -webkit-backdrop-filter: blur(12px);
-  }
+  /* Chr (2026年06月29日): 避免全站所有玻璃拟态节点长期占用独立合成层，交回 Tailwind 按需生成 backdrop-filter。 */
 
   .group:hover img {
     will-change: transform;
@@ -55,10 +52,6 @@ input[type=range]::-webkit-slider-thumb {
 
 /* 4. 火狐专项优化与布局兜底 */
 @layer base {
-  [class*="backdrop-blur-"] {
-    will-change: backdrop-filter;
-  }
-
   @-moz-document url-prefix() {
     [class*="backdrop-blur-md"] {
       backdrop-filter: blur(8px) !important;

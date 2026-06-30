@@ -1,9 +1,8 @@
 "use client";
 
 import { useState, useMemo, useRef, useEffect } from 'react';
-import TimelineNode from './TimelineNode';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Search, Sparkles, LayoutGrid, ListTree, Calendar, Hash, ArrowUp } from 'lucide-react';
+import { Search, Sparkles, Calendar, ArrowUp } from 'lucide-react';
 import Link from 'next/link';
 
 export default function TimelineClient({ posts: initialPosts, tags }: { posts: any[], tags: { name: string, count: number }[] }) {
@@ -12,27 +11,10 @@ export default function TimelineClient({ posts: initialPosts, tags }: { posts: a
   const [searchQuery, setSearchQuery] = useState("");
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
-  // 🌟 默认视图模式 ('timeline' | 'card')
-  const [viewMode, setViewMode] = useState<'timeline' | 'card'>('timeline');
   const [showScrollTop, setShowScrollTop] = useState(false);
 
   const searchContainerRef = useRef<HTMLDivElement>(null);
   const gridScrollRef = useRef<HTMLDivElement>(null);
-
-  // 🌟 核心魔法 1：强制移动端为矩阵模式
-  useEffect(() => {
-    const enforceMobileView = () => {
-      if (window.innerWidth < 768) {
-        setViewMode('card');
-      }
-    };
-
-    // 初始化检测
-    enforceMobileView();
-    // 监听窗口大小变化
-    window.addEventListener('resize', enforceMobileView);
-    return () => window.removeEventListener('resize', enforceMobileView);
-  }, []);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -155,132 +137,80 @@ export default function TimelineClient({ posts: initialPosts, tags }: { posts: a
             ))}
           </div>
 
-          {/* 🌟 核心魔法 2：隐藏手机端的视图切换按钮 (hidden md:flex) */}
-          <div className="hidden md:flex bg-white/50 dark:bg-slate-900/50 p-1 rounded-2xl shadow-inner shrink-0">
-            <button onClick={() => setViewMode('timeline')} className={`flex items-center gap-2 px-4 py-2 rounded-xl font-bold text-sm transition-all duration-300 ${viewMode === 'timeline' ? 'bg-white dark:bg-slate-700 text-indigo-500 shadow-sm' : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'}`}>
-              <ListTree size={16} />
-              <span>中枢链路</span>
-            </button>
-            <button onClick={() => setViewMode('card')} className={`flex items-center gap-2 px-4 py-2 rounded-xl font-bold text-sm transition-all duration-300 ${viewMode === 'card' ? 'bg-white dark:bg-slate-700 text-indigo-500 shadow-sm' : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'}`}>
-              <LayoutGrid size={16} />
-              <span>矩阵网格</span>
-            </button>
-          </div>
         </div>
 
       </div>
 
-      <AnimatePresence mode="wait">
-
-        {/* ================= 模式 1：网格卡片流 (手机端强制此模式) ================= */}
-        {viewMode === 'card' && (
-          <motion.div
-            key="card-view"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            transition={{ duration: 0.3 }}
-            className="relative w-full"
-          >
-            <style dangerouslySetInnerHTML={{ __html: `
+      {/* Chr (2026年06月29日): 归档页固定使用单一网格视图。 */}
+      <motion.div
+        key="card-view"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.3 }}
+        className="relative w-full"
+      >
+        <style dangerouslySetInnerHTML={{ __html: `
               .cyber-scrollbar::-webkit-scrollbar { width: 8px; md:width: 12px; }
               .cyber-scrollbar::-webkit-scrollbar-track { background: rgba(99, 102, 241, 0.05); border-radius: 12px; margin-top: 20px; margin-bottom: 56px; }
               .cyber-scrollbar::-webkit-scrollbar-thumb { background: linear-gradient(180deg, #818cf8 0%, #c084fc 100%); border-radius: 12px; border: 2px solid transparent; background-clip: padding-box; }
               .fade-edges { -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 5%, black 95%, transparent 100%); mask-image: linear-gradient(to bottom, transparent 0%, black 5%, black 95%, transparent 100%); }
             `}} />
 
-            <div
-              ref={gridScrollRef}
-              onScroll={handleGridScroll}
-              className="h-[75vh] overflow-y-auto cyber-scrollbar pr-2 sm:pr-5 pb-10 fade-edges"
-            >
-              {/* 🌟 核心魔法 3：强制手机端 grid-cols-2 双列显示，减小 gap */}
-              <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 md:gap-6 pt-4 pb-10">
-                {timelinePosts.map((post, idx) => (
-                  <motion.div key={post.slug} initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.3, delay: idx * 0.05 }}>
-                    <div className="bg-white/60 dark:bg-slate-800/70 backdrop-blur-xl border border-white/50 dark:border-slate-700/50 rounded-2xl md:rounded-3xl overflow-hidden shadow-lg flex flex-col h-full group relative hover:-translate-y-1 transition-transform duration-300">
-
-                      <Link href={`/posts/${post.slug}`} className="block flex-1 flex flex-col cursor-pointer">
-                        {/* 🌟 图片高度自适应：手机变矮，电脑变高 */}
-                        <div className="relative h-28 sm:h-36 md:h-40 overflow-hidden">
-                          <img src={post.cover} alt={post.title} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
-                          <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
-                          {/* 🌟 日期标签微缩 */}
-                          <span className="absolute bottom-2 left-2 md:bottom-3 md:left-4 text-white/90 text-[9px] md:text-xs font-mono font-bold bg-black/40 backdrop-blur-sm px-1.5 py-0.5 md:px-2 md:py-1 rounded flex items-center gap-1">
-                            <Calendar size={10} className="md:w-3 md:h-3"/> {post.date.split(' ')[0]}
-                          </span>
-                        </div>
-
-                        {/* 🌟 文本边距和字号全方位缩放 */}
-                        <div className="p-3 md:p-5 flex-1 flex flex-col">
-                          <h3 className="text-xs sm:text-sm md:text-lg font-bold text-slate-800 dark:text-slate-100 mb-1 md:mb-2 line-clamp-2 transition-colors group-hover:text-indigo-500">{post.title}</h3>
-                          <p className="text-[10px] sm:text-xs md:text-sm text-slate-500 dark:text-slate-400 mb-2 md:mb-4 line-clamp-2 flex-1 leading-snug">{post.description || "暂时没有描述喵..."}</p>
-                          <div className="flex flex-wrap gap-1 sm:gap-2 mt-auto">
-                            {post.tags.map((tag: string) => (
-                              <span key={tag} className="text-[8px] md:text-[10px] font-bold text-indigo-500 bg-indigo-50 dark:bg-indigo-500/10 px-1.5 py-0.5 md:px-2 md:py-1 rounded">#{tag}</span>
-                            ))}
-                          </div>
-                        </div>
-                      </Link>
-
+        <div
+          ref={gridScrollRef}
+          onScroll={handleGridScroll}
+          className="h-[75vh] overflow-y-auto cyber-scrollbar pr-2 sm:pr-5 pb-10 fade-edges"
+        >
+          <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 md:gap-6 pt-4 pb-10">
+            {timelinePosts.map((post, idx) => (
+              <motion.div key={post.slug} initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.3, delay: idx * 0.05 }}>
+                <div className="bg-white/60 dark:bg-slate-800/70 backdrop-blur-xl border border-white/50 dark:border-slate-700/50 rounded-2xl md:rounded-3xl overflow-hidden shadow-lg flex flex-col h-full group relative hover:-translate-y-1 transition-transform duration-300">
+                  <Link href={`/posts/${post.slug}`} className="block flex-1 flex flex-col cursor-pointer">
+                    <div className="relative h-28 sm:h-36 md:h-40 overflow-hidden">
+                      <img src={post.cover} alt={post.title} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+                      <span className="absolute bottom-2 left-2 md:bottom-3 md:left-4 text-white/90 text-[9px] md:text-xs font-mono font-bold bg-black/40 backdrop-blur-sm px-1.5 py-0.5 md:px-2 md:py-1 rounded flex items-center gap-1">
+                        <Calendar size={10} className="md:w-3 md:h-3"/> {post.date.split(' ')[0]}
+                      </span>
                     </div>
-                  </motion.div>
-                ))}
-              </div>
+
+                    <div className="p-3 md:p-5 flex-1 flex flex-col">
+                      <h3 className="text-xs sm:text-sm md:text-lg font-bold text-slate-800 dark:text-slate-100 mb-1 md:mb-2 line-clamp-2 transition-colors group-hover:text-indigo-500">{post.title}</h3>
+                      <p className="text-[10px] sm:text-xs md:text-sm text-slate-500 dark:text-slate-400 mb-2 md:mb-4 line-clamp-2 flex-1 leading-snug">{post.description || "暂时没有描述"}</p>
+                      <div className="flex flex-wrap gap-1 sm:gap-2 mt-auto">
+                        {post.tags.map((tag: string) => (
+                          <span key={tag} className="text-[8px] md:text-[10px] font-bold text-indigo-500 bg-indigo-50 dark:bg-indigo-500/10 px-1.5 py-0.5 md:px-2 md:py-1 rounded">#{tag}</span>
+                        ))}
+                      </div>
+                    </div>
+                  </Link>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+
+          {timelinePosts.length === 0 && (
+            <div className="text-center py-20 text-slate-500 dark:text-slate-400 font-bold uppercase tracking-widest text-sm">
+              这个频段没有接收到任何信号
             </div>
+          )}
+        </div>
 
-            {/* 火箭按钮 */}
-            <AnimatePresence>
-              {showScrollTop && (
-                <motion.button
-                  initial={{ opacity: 0, scale: 0.5, y: 10 }}
-                  animate={{ opacity: 1, scale: 1, y: 0 }}
-                  exit={{ opacity: 0, scale: 0.5, y: 10 }}
-                  onClick={scrollToTop}
-                  className="absolute bottom-4 -right-3 w-9 h-9 flex items-center justify-center bg-gradient-to-t from-purple-500 to-indigo-500 text-white rounded-full shadow-lg shadow-purple-500/40 hover:shadow-purple-500/60 hover:-translate-y-1 transition-all z-50 group pointer-events-auto"
-                  title="回到顶部"
-                >
-                  <ArrowUp size={18} className="group-hover:-translate-y-1 transition-transform" />
-                </motion.button>
-              )}
-            </AnimatePresence>
-
-          </motion.div>
-        )}
-
-        {/* ================= 模式 2：传统时间线 (前台纯净版) ================= */}
-        {viewMode === 'timeline' && (
-          <motion.div
-            key="timeline-view"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            transition={{ duration: 0.3 }}
-            className="relative overflow-hidden p-2 md:p-10 min-h-[500px]"
-          >
-            <div className="absolute border-opacity-20 border-indigo-500 dark:border-indigo-400/20 h-full border-2 left-1/2 transform -translate-x-1/2 rounded-full transition-colors duration-1000"></div>
-
-            <div className="relative z-10 flex flex-col gap-16">
-              <AnimatePresence mode='popLayout'>
-                {timelinePosts.map((post, index) => (
-                  <TimelineNode
-                    key={post.slug}
-                    post={post}
-                    index={index + 1}
-                  />
-                ))}
-              </AnimatePresence>
-
-              {timelinePosts.length === 0 && (
-                 <div className="text-center py-20 text-slate-500 dark:text-slate-400 font-bold uppercase tracking-widest text-sm">
-                    这个频段没有接收到任何信号 📡
-                 </div>
-              )}
-            </div>
-          </motion.div>
-        )}
-
-      </AnimatePresence>
+        <AnimatePresence>
+          {showScrollTop && (
+            <motion.button
+              initial={{ opacity: 0, scale: 0.5, y: 10 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.5, y: 10 }}
+              onClick={scrollToTop}
+              className="absolute bottom-4 -right-3 w-9 h-9 flex items-center justify-center bg-gradient-to-t from-purple-500 to-indigo-500 text-white rounded-full shadow-lg shadow-purple-500/40 hover:shadow-purple-500/60 hover:-translate-y-1 transition-all z-50 group pointer-events-auto"
+              title="回到顶部"
+            >
+              <ArrowUp size={18} className="group-hover:-translate-y-1 transition-transform" />
+            </motion.button>
+          )}
+        </AnimatePresence>
+      </motion.div>
     </div>
   );
 }

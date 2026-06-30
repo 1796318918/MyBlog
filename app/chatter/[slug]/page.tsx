@@ -20,7 +20,6 @@ import Navbar from '../../../components/Navbar';
 import PageTransition from '../../../components/PageTransition';
 import { siteConfig } from '../../../siteConfig';
 import ClientSocials from '../../../components/ClientSocials';
-import SidebarLyric from '../../../components/SidebarLyric';
 import BackButton from '../../../components/BackButton';
 import Comments from '../../../components/Comments';
 
@@ -31,7 +30,8 @@ export async function generateStaticParams() {
   return filenames
     .filter((name) => name.endsWith('.md'))
     .map((name) => ({
-      slug: name.replace(/\.md$/, ''),
+      // Chr (2026年06月29日): output: export 的 dev 校验使用 URL 编码后的中文动态段。
+      slug: encodeURIComponent(name.replace(/\.md$/, '')),
     }));
 }
 
@@ -101,6 +101,17 @@ async function getChatterData(slug: string) {
   };
 }
 
+function decodeSlug(slug: string) {
+  // Chr (2026年06月29日): 兼容 Next 静态导出中中文 slug 被单层或双层 URL 编码的情况。
+  let decoded = slug;
+  for (let i = 0; i < 3; i++) {
+    const next = decodeURIComponent(decoded);
+    if (next === decoded) return decoded;
+    decoded = next;
+  }
+  return decoded;
+}
+
 function getRecentChatters(currentSlug: string) {
   const chattersDirectory = path.join(process.cwd(), 'chatters');
   let fileNames: string[] = [];
@@ -129,8 +140,9 @@ function generateCalendarMatrix(year: number, month: number, targetDay: number) 
 
 export default async function ChatterDetail({ params }: { params: Promise<{ slug: string }> }) {
   const resolvedParams = await params;
-  const chatterData = await getChatterData(resolvedParams.slug);
-  const recentChatters = getRecentChatters(resolvedParams.slug);
+  const slug = decodeSlug(resolvedParams.slug);
+  const chatterData = await getChatterData(slug);
+  const recentChatters = getRecentChatters(slug);
 
   const dateObj = new Date(chatterData.date || '2026-03-24');
   const yearStr = dateObj.getFullYear();
@@ -295,8 +307,6 @@ export default async function ChatterDetail({ params }: { params: Promise<{ slug
               <p className="text-xs text-slate-700 dark:text-slate-300 leading-relaxed font-medium mb-4">{siteConfig.bio}</p>
               <ClientSocials />
             </div>
-
-            <SidebarLyric />
 
             <div className="bg-white/60 dark:bg-slate-800/50 backdrop-blur-xl rounded-3xl p-6 border border-white/40 dark:border-white/10 shadow-xl">
               <div className="flex justify-between items-center mb-6">

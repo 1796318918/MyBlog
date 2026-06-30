@@ -22,7 +22,6 @@ import ClientSocials from '../../../components/ClientSocials';
 import ClientTOC from '../../../components/ClientTOC';
 import BackButton from '../../../components/BackButton';
 import Comments from '../../../components/Comments';
-import SidebarLyric from '../../../components/SidebarLyric';
 
 export async function generateStaticParams() {
   const postsDirectory = path.join(process.cwd(), 'posts');
@@ -33,7 +32,8 @@ export async function generateStaticParams() {
   return filenames
     .filter((name) => name.endsWith('.md'))
     .map((name) => ({
-      slug: name.replace(/\.md$/, ''),
+      // Chr (2026年06月29日): output: export 的 dev 校验使用 URL 编码后的中文动态段。
+      slug: encodeURIComponent(name.replace(/\.md$/, '')),
     }));
 }
 
@@ -49,6 +49,17 @@ function extractToc(content: string) {
     });
   }
   return toc;
+}
+
+function decodeSlug(slug: string) {
+  // Chr (2026年06月29日): 兼容 Next 静态导出中中文 slug 被单层或双层 URL 编码的情况。
+  let decoded = slug;
+  for (let i = 0; i < 3; i++) {
+    const next = decodeURIComponent(decoded);
+    if (next === decoded) return decoded;
+    decoded = next;
+  }
+  return decoded;
 }
 
 async function getPostData(slug: string) {
@@ -126,8 +137,9 @@ function getRecentPosts(currentSlug: string) {
 
 export default async function Post({ params }: { params: Promise<{ slug: string }> }) {
   const resolvedParams = await params;
-  const postData = await getPostData(resolvedParams.slug);
-  const recentPosts = getRecentPosts(resolvedParams.slug);
+  const slug = decodeSlug(resolvedParams.slug);
+  const postData = await getPostData(slug);
+  const recentPosts = getRecentPosts(slug);
 
   return (
     <div className="min-h-screen relative pb-20">
@@ -249,7 +261,7 @@ export default async function Post({ params }: { params: Promise<{ slug: string 
                     .prose pre { padding: 1.25rem !important; margin-top: 1.5rem !important; margin-bottom: 1.5rem !important; }
                     .prose pre code { font-size: 0.9em !important; }
                     .prose p code, .prose li code { padding: 0.2rem 0.4rem !important; font-size: 0.9em !important; border-radius: 0.375rem !important;}
-                    .prose img { margin: 2rem auto !important; border-radius: 2rem !important; box-shadow: 0 20px 50px rgba(0,0,0,0.15) !important; }
+                    .prose img { margin: 2rem auto !important; border-radius: 1rem !important; box-shadow: 0 20px 50px rgba(0,0,0,0.15) !important; }
                   }
                 `}</style>
 
@@ -276,8 +288,6 @@ export default async function Post({ params }: { params: Promise<{ slug: string 
               <p className="text-xs text-slate-700 dark:text-slate-300 leading-relaxed font-medium mb-4">{siteConfig.bio}</p>
               <ClientSocials />
             </div>
-
-            <SidebarLyric />
 
             <div className="bg-white/60 dark:bg-slate-800/50 backdrop-blur-xl rounded-3xl p-6 border border-white/40 dark:border-white/10 shadow-xl">
               <h3 className="font-black text-slate-900 dark:text-white mb-4 border-l-4 border-indigo-500 pl-2 text-sm">RECOMMENDED</h3>
