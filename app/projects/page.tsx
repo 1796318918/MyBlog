@@ -1,7 +1,7 @@
 import Navbar from '../../components/Navbar';
 import PageTransition from '../../components/PageTransition';
 import ProjectsBoard from './ProjectsBoard';
-import {siteConfig} from "@/siteConfig";
+import { siteConfig } from "@/siteConfig";
 
 export const metadata = {
   title: "项目 | " + siteConfig.title,
@@ -13,9 +13,8 @@ export default function ProjectsPage() {
     <div className="min-h-screen relative pb-20">
       <Navbar />
       <PageTransition>
-        <div className="mt-28">
-          <ProjectsBoard />
-        </div>
+        {/* 移除 <div className="mt-28">，让 ProjectsBoard 自己控制间距 */}
+        <ProjectsBoard />
       </PageTransition>
     </div>
   );

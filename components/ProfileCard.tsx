@@ -29,7 +29,7 @@ export default function ProfileCard({ postCount, chatterCount}: { postCount: num
   return (
     <div
       onClick={() => router.push('/about')}
-      className="md:col-span-7 rounded-3xl bg-white/40 dark:bg-slate-800/50 backdrop-blur-md border border-white/40 dark:border-white/10 shadow-xl p-5 sm:p-6 md:p-8 flex flex-col justify-between transition-all duration-700 hover:scale-[1.01] cursor-pointer group relative overflow-hidden h-full min-h-[220px] md:min-h-[280px]"
+      className="md:col-span-7 rounded-3xl bg-[#f8f8f8] dark:bg-[#1e1e1e] shadow-xl p-5 sm:p-6 md:p-8 flex flex-col justify-between transition-all duration-700 hover:shadow-2xl hover:scale-[1.01] cursor-pointer group relative overflow-hidden h-full min-h-[220px] md:min-h-[280px]"
     >
       <div className="flex items-start justify-between relative z-10">
         <div className="flex items-center gap-4 md:gap-6 w-full">
@@ -37,10 +37,6 @@ export default function ProfileCard({ postCount, chatterCount}: { postCount: num
             <img src={siteConfig.avatarUrl} alt="avatar" className="w-full h-full rounded-lg md:rounded-xl object-cover bg-white" />
           </div>
           <div className="flex-1 min-w-0">
-            {/* 🌟 核心修复点：
-                1. 增加了 pb-1 (padding-bottom) 给字母降部留空间
-                2. 增加了 leading-snug 确保行高不至于太扁
-            */}
             <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-slate-900 dark:text-white mb-1 md:mb-2 pb-1 leading-snug tracking-wider transition-colors duration-700 truncate">
               {siteConfig.authorName}
             </h1>
@@ -60,7 +56,6 @@ export default function ProfileCard({ postCount, chatterCount}: { postCount: num
 
         <div className="flex gap-2 md:gap-3 flex-wrap justify-center md:justify-end w-full md:w-auto" onClick={(e) => e.stopPropagation()}>
           <SocialBtn type="github" url={siteConfig.social?.github} />
-          {/* Chr (2026年06月23日) */}
           <SocialBtn type="google" url={googleMailUrl} copyLabel="复制邮箱地址" onCopy={copyGoogleEmail} />
           <SocialBtn type="email" onClick={() => copyToClipboard(siteConfig.social?.email || '', '邮箱')} />
           <SocialBtn type="qq" onClick={() => copyToClipboard(siteConfig.social?.qq || '', 'QQ号')} />
@@ -80,7 +75,6 @@ function StatItem({ count, label, color }: { count: number, label: string, color
   );
 }
 
-// Chr (2026年06月23日)
 function SocialBtn({
   type,
   url,
@@ -126,7 +120,6 @@ function SocialBtn({
       </a>
       {copyLabel && onCopy ? (
         <>
-          {/* Chr (2026年06月23日) */}
           <span aria-hidden="true" className="absolute left-1/2 bottom-full h-3 w-28 -translate-x-1/2" />
           <button
             type="button"
