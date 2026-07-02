@@ -3,9 +3,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { ThemeProvider } from "../components/ThemeProvider";
 import { siteConfig } from "../siteConfig";
-import GlobalToolbox from "../components/GlobalToolbox";
 import SplashScreen from "../components/SplashScreen";
-//import CyberCat from '../components/CyberCat';
 
 import MobileBackButton from '../components/MobileBackButton';
 
@@ -68,10 +66,6 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
 
               <div className="relative z-10 flex-1 flex flex-col">
                 {children}
-              </div>
-
-              <div className="hidden md:block">
-                <GlobalToolbox />
               </div>
 
               <div className="md:hidden block">

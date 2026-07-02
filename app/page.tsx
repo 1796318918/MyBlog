@@ -7,11 +7,9 @@ import PageTransition from '../components/PageTransition';
 import SearchBar from '../components/SearchBar';
 import { siteConfig } from '../siteConfig';
 import ProfileCard from '../components/ProfileCard';
-import { albums } from '../data/albums';
 import { ToastProvider } from '../components/ToastProvider';
 
 import LatestPostsCarousel from '../components/LatestPostsCarousel';
-import LatestChatterCarousel from '../components/LatestChatterCarousel';
 
 function formatUpdateTime(dateString: string) {
   if (!dateString || dateString === '1970-01-01') return '刚刚更新';
@@ -79,7 +77,6 @@ export default function Home() {
   const top5Chatters = allChatters.length > 0 ? allChatters.slice(0, 5) : [{ slug: 'none', title: '暂无记录', description: '记录一段思绪...', cover: 'https://images.unsplash.com/photo-1550751827-4bd374c3f58b?q=80&w=1000&auto=format&fit=crop', date: '', formattedDate: '' }];
 
   const chatterCount = allChatters.length;
-  const realPhotoCount = albums.reduce((total, album) => total + album.photos.length, 0);
 
   return (
     <ToastProvider>
@@ -96,7 +93,7 @@ export default function Home() {
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 w-full">
                 {/* Chr (2026年06月29日): 移除音乐播放器后，个人信息卡片占满整行。 */}
                 <div className="col-span-1 lg:col-span-12 flex flex-col">
-                    <ProfileCard postCount={allPosts.length} chatterCount={chatterCount} photoCount={realPhotoCount}/>
+                    <ProfileCard postCount={allPosts.length} chatterCount={chatterCount}/>
                 </div>
               </div>
 
