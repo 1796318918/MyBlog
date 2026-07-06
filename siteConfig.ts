@@ -14,7 +14,7 @@ export const siteConfig = {
   themeColors: ["#a18cd1", "#fbc2eb", "#a1c4fd", "#c2e9fb"], 
   bgImages: ["https://bu.dusays.com/2026/03/24/69c1e38b4c370.jpg", "https://bu.dusays.com/2026/03/24/69c26fe4acdb5.jpg", "https://bu.dusays.com/2026/03/24/69c26fe4d9486.jpg"],
 
-  defaultPostCover: "/images/default-cover.jpg",
+  defaultPostCover: "/images/defaultCover.jpg",
 
   social: {
     github: "https://github.com/1796318918",
